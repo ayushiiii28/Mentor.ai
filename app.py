@@ -1,13 +1,11 @@
 import streamlit as st
-import requests
+from core.orchestrator import run_mentor_ai
 
 st.set_page_config(
     page_title="MENTOR.AI",
     page_icon="🧠",
     layout="wide"
 )
-
-BACKEND_URL = "http://127.0.0.1:8000/mentor"
 
 # -------------------- GLOBAL STYLING --------------------
 st.markdown("""
@@ -197,14 +195,7 @@ Goals: {goals}
 
     with st.chat_message("assistant"):
         with st.spinner("🤖 Multi-agents are collaborating..."):
-            response = requests.get(
-                BACKEND_URL,
-                params={
-                    "query": final_query,
-                    "mode": st.session_state.mode
-                }
-            )
-            result = response.json()["response"]
+            result = run_mentor_ai(final_query, st.session_state.mode)
             render_sections(result)
 
     st.session_state.chat.append({"role": "assistant", "content": result})
