@@ -87,6 +87,21 @@ textarea, input {
 </style>
 """, unsafe_allow_html=True)
 
+# -------------------- SECTION RENDERER --------------------
+def render_sections(text):
+    sections = text.split("\n---\n")
+    for section in sections:
+        lines = section.strip().split("\n")
+        if len(lines) > 1:
+            title = lines[0]
+            body = "\n".join(lines[1:])
+        else:
+            title = "Mentor Output"
+            body = section
+
+        with st.expander(title, expanded=True):
+            st.markdown(body)
+
 # -------------------- AGENT STATE --------------------
 if "mode" not in st.session_state:
     st.session_state.mode = "Full Mentor"
@@ -190,7 +205,7 @@ Goals: {goals}
                 }
             )
             result = response.json()["response"]
-            st.markdown(result)
+            render_sections(result)
 
     st.session_state.chat.append({"role": "assistant", "content": result})
 
