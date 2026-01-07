@@ -48,20 +48,17 @@ div.stButton > button:hover {
     background: rgba(255,255,255,0.04);
     border-radius: 16px;
     padding: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #020617, #020617, #0f172a);
-    border-right: 1px solid rgba(255,255,255,0.1);
 }
 
 /* Inputs */
 textarea, input {
     background-color: rgba(255,255,255,0.05) !important;
     color: white !important;
-    border-radius: 10px !important;
 }
 
 /* Active agent badge */
@@ -87,18 +84,10 @@ textarea, input {
 
 # -------------------- SECTION RENDERER --------------------
 def render_sections(text):
-    sections = text.split("\n---\n")
-    for section in sections:
-        lines = section.strip().split("\n")
-        if len(lines) > 1:
-            title = lines[0]
-            body = "\n".join(lines[1:])
-        else:
-            title = "Mentor Output"
-            body = section
-
-        with st.expander(title, expanded=True):
-            st.markdown(body)
+    blocks = text.split("\n\n")
+    for block in blocks:
+        if block.strip():
+            st.markdown(block)
 
 # -------------------- AGENT STATE --------------------
 if "mode" not in st.session_state:
@@ -118,20 +107,9 @@ with st.sidebar:
     domain = st.text_input("Domain / Major", placeholder="AI / CSE / Data Science")
     goals = st.text_area("Goals", placeholder="Placements, GATE, MS, Research...")
 
-    st.markdown("---")
-    st.markdown("### ⚙️ System Capabilities")
-    st.markdown("✔ Personalized planning")
-    st.markdown("✔ Intelligent tutoring")
-    st.markdown("✔ AI assessments")
-    st.markdown("✔ Emotional support")
-    st.markdown("✔ Career intelligence")
-
 # -------------------- MAIN AREA --------------------
 st.markdown("# 🎓 MENTOR.AI")
 st.markdown("### An Intelligent Multi-Agent System for Students")
-st.write(
-    "MENTOR.AI collaborates multiple AI agents to guide students in academics, career planning, assessment, and well-being."
-)
 
 # ----------- AGENT CARDS -----------
 st.markdown("## 🧩 Choose Your Mentor Agent")
@@ -164,7 +142,6 @@ with col6:
         set_mode("Full Mentor")
 
 st.markdown(f"<div class='active-agent'>Active Agent: {st.session_state.mode}</div>", unsafe_allow_html=True)
-
 st.markdown("---")
 
 # -------------------- CHAT SYSTEM --------------------
@@ -172,30 +149,26 @@ if "chat" not in st.session_state:
     st.session_state.chat = []
 
 for msg in st.session_state.chat:
-    if msg["role"] == "user":
-        st.chat_message("user").markdown(msg["content"])
-    else:
-        st.chat_message("assistant").markdown(msg["content"])
+    st.chat_message(msg["role"]).markdown(msg["content"])
 
 user_input = st.chat_input("Describe your academic or career concern...")
 
 if user_input:
     profile_context = f"""
 Student profile:
-Name: {name}
 Year: {year}
 Domain: {domain}
 Goals: {goals}
 """
 
-    final_query = profile_context + "\nUser query: " + user_input
+    final_query = profile_context + "\nUser request: " + user_input
 
     st.session_state.chat.append({"role": "user", "content": user_input})
     st.chat_message("user").markdown(user_input)
 
     with st.chat_message("assistant"):
-        with st.spinner("🤖 Multi-agents are collaborating..."):
-            result = run_mentor_ai(final_query)
+        with st.spinner(f"🤖 {st.session_state.mode} agent working..."):
+            result = run_mentor_ai(final_query, st.session_state.mode)
             render_sections(result)
 
     st.session_state.chat.append({"role": "assistant", "content": result})
