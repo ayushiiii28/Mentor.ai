@@ -13,15 +13,21 @@ st.set_page_config(
 # -------------------- GLOBAL STYLING --------------------
 st.markdown("""
 <style>
+
+/* Background */
 .stApp {
     background: radial-gradient(circle at top left, #0f172a, #020617);
     color: white;
 }
+
+/* Titles */
 h1, h2, h3 {
     background: linear-gradient(90deg, #a78bfa, #22d3ee);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+/* Agent cards */
 div.stButton > button {
     height: 95px;
     border-radius: 22px;
@@ -30,31 +36,55 @@ div.stButton > button {
     font-weight: 700;
     background: linear-gradient(135deg, #1e1b4b, #0f172a);
     color: #e5e7eb;
+    box-shadow: 0 0 20px rgba(167,139,250,0.15);
+    transition: all 0.25s ease-in-out;
 }
+div.stButton > button:hover {
+    border: 1px solid #22d3ee;
+    box-shadow: 0 0 25px rgba(34,211,238,0.5);
+    transform: scale(1.04);
+    color: white;
+}
+
+/* Chat bubbles */
 [data-testid="stChatMessage"] {
     background: rgba(255,255,255,0.04);
     border-radius: 16px;
-    padding: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
 }
+
+/* Sidebar */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #020617, #020617, #0f172a);
+    border-right: 1px solid rgba(255,255,255,0.1);
 }
+
+/* Inputs */
 textarea, input {
     background-color: rgba(255,255,255,0.05) !important;
     color: white !important;
+    border-radius: 10px !important;
 }
+
+/* Active agent badge */
 .active-agent {
     background: linear-gradient(90deg, #22d3ee, #a78bfa);
     color: black;
     padding: 10px 16px;
     border-radius: 999px;
     font-weight: 700;
+    display: inline-block;
+    margin-top: 10px;
 }
+
+/* Footer */
 .footer {
     text-align: center;
     opacity: 0.6;
     padding-top: 20px;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -71,9 +101,11 @@ def extract_text(file):
                 text.append(t)
         except:
             continue
+
     final_text = " ".join("\n".join(text).split())
     if not final_text.strip():
         return "No readable text found. Possibly scanned PDF."
+
     return final_text[:MAX_CHARS]
 
 # -------------------- SCORE PARSER --------------------
@@ -86,8 +118,12 @@ def extract_score(text):
 # -------------------- STATE --------------------
 if "mode" not in st.session_state:
     st.session_state.mode = "Full Mentor"
+
 if "page" not in st.session_state:
     st.session_state.page = "Mentor"
+
+if "chat" not in st.session_state:
+    st.session_state.chat = []
 
 def set_mode(mode):
     st.session_state.mode = mode
@@ -99,6 +135,7 @@ with st.sidebar:
     st.caption("Multi-Agent Academic & Career Mentor")
 
     st.markdown("### 👤 Student Profile")
+    name = st.text_input("Name", placeholder="Your name")
     year = st.selectbox("Year of study", ["1st Year", "2nd Year", "3rd Year", "4th Year"])
     domain = st.text_input("Domain / Major", placeholder="AI / CSE / Data Science")
     goals = st.text_area("Goals", placeholder="Placements, GATE, MS, Research...")
@@ -139,9 +176,7 @@ if st.session_state.page == "Mentor":
     st.markdown(f"<div class='active-agent'>Active Agent: {st.session_state.mode}</div>", unsafe_allow_html=True)
     st.markdown("---")
 
-    if "chat" not in st.session_state:
-        st.session_state.chat = []
-
+    # ---------- CHAT HISTORY ----------
     for msg in st.session_state.chat:
         st.chat_message(msg["role"]).markdown(msg["content"])
 
@@ -150,12 +185,16 @@ if st.session_state.page == "Mentor":
     if user_input:
         profile_context = f"""
 Student profile:
+Name: {name}
 Year: {year}
 Domain: {domain}
 Goals: {goals}
 """
+
         final_query = profile_context + "\nUser request: " + user_input
+
         st.session_state.chat.append({"role": "user", "content": user_input})
+        st.chat_message("user").markdown(user_input)
 
         with st.chat_message("assistant"):
             with st.spinner(f"🤖 {st.session_state.mode} agent working..."):
