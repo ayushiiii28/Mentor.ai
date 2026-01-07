@@ -195,7 +195,7 @@ Goals: {goals}
 
     with st.chat_message("assistant"):
         with st.spinner("🤖 Multi-agents are collaborating..."):
-            result = run_mentor_ai(final_query, st.session_state.mode)
+            result = run_mentor_ai(final_query)
             render_sections(result)
 
     st.session_state.chat.append({"role": "assistant", "content": result})
