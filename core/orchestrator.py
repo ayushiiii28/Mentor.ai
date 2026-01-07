@@ -10,14 +10,29 @@ def run_mentor_ai(query: str, mode: str = "Full Mentor"):
 
     query = query[:MAX_CHARS]
 
+    # -------- PROMPT MODE CONTROL --------
+    if mode == "Full Mentor":
+        rules = """
+- Bullet points only
+- Very concise
+- High-level guidance
+- Max 80 words
+"""
+    else:
+        rules = """
+- Bullet points only
+- Detailed and structured
+- Practical steps
+- Examples where useful
+- Max 220 words
+"""
+
     base_prompt = f"""
 User request:
 {query}
 
 Rules:
-- Bullet points only
-- Clear and concise
-- Max 100 words
+{rules}
 """
 
     outputs = {}
