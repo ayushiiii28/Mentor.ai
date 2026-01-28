@@ -159,6 +159,7 @@ if st.session_state.page == "Mentor":
 
     col1, col2, col3 = st.columns(3)
     col4, col5, col6 = st.columns(3)
+    col7, col8, col9 = st.columns(3)
 
     with col1:
         if st.button("📘 Academic Planner", use_container_width=True): set_mode("Planner")
@@ -171,6 +172,8 @@ if st.session_state.page == "Mentor":
     with col5:
         if st.button("🚀 Career Mentor", use_container_width=True): set_mode("Career")
     with col6:
+        if st.button("🎉 Party Planner", use_container_width=True): set_mode("Party")
+    with col7:
         if st.button("🤖 Full Mentor Mode", use_container_width=True): set_mode("Full Mentor")
 
     st.markdown(f"<div class='active-agent'>Active Agent: {st.session_state.mode}</div>", unsafe_allow_html=True)
