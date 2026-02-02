@@ -4,7 +4,7 @@ from agents.assessment_agent import assessment_chain
 from agents.wellbeing_agent import wellbeing_chain
 from agents.career_agent import career_chain
 from agents.resume_agent import resume_chain
-from agents.party_agent import party_chain
+
 
 MAX_CHARS = 1800
 
@@ -37,7 +37,6 @@ Rules:
         outputs["assessment"] = assessment_chain.invoke({"query": base_prompt}).content
         outputs["wellbeing"] = wellbeing_chain.invoke({"query": base_prompt}).content
         outputs["career"] = career_chain.invoke({"query": base_prompt}).content
-        outputs["party"] = party_chain.invoke({"query": base_prompt}).content
 
 
     elif mode == "Planner":
@@ -70,8 +69,6 @@ Rules:
         final_output += f"🌱 WELL-BEING SUPPORT\n{outputs['wellbeing']}\n\n"
     if "career" in outputs:
         final_output += f"🚀 CAREER GUIDANCE\n{outputs['career']}\n\n"
-    if "party" in outputs:
-        final_output += f"🎉 PARTY PLANNER\n{outputs['party']}\n\n"
 
     return final_output.strip()
 
